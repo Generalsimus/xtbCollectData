@@ -1,20 +1,25 @@
 import kix from "kix";
 import "./style.scss";
-import Logo from "./logo.svg";
+import "./bulma.min.css";
+import { StrongPairPaige } from "./page/strong-pair";
 
-function App() {
-  let time = new Date().toTimeString();
+const Container = () => {
+  return (
+    <div >
+      <div class="tabs" >
+        <ul>
+          <li class="is-active">
+            <route-link href="/">Chart</route-link>
+          </li>
+          <li>
+            <route-link href="/strong-pair">Strong pair</route-link>
+          </li>
+        </ul>
+      </div>
+      <route-switch path="/" unique={true} component={<h1>PAGE 1</h1>} />
+      <route-switch path="/strong-pair" component={<StrongPairPaige />} />
+    </div>
+  );
+};
 
-  setInterval(() => {
-    time = new Date().toTimeString();
-  }, 1000);
-
-  return <div class="contain">
-    <h3 class="time">{time}</h3>
-    <a href="https://kixjs.ml" target="_blank">
-      <Logo />
-    </a>
-  </div>
-}
-
-kix(document.body, <App />);
+kix(document.body, <Container />);

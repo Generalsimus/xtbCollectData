@@ -1,34 +1,55 @@
 body {
   margin: 0;
-  background: #262626;
-}
-
-.contain {
+  direction: ltr;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
+}
 
-  >a {
+.pointer {
+  cursor: pointer;
+}
+
+.flex {
+  display: flex;
+}
+.row {
+  flex-direction: row;
+}
+.column {
+  flex-direction: column;
+}
+
+// Define mixins for flex gaps
+@mixin flex-gap($size) {
+  gap: $size;
+}
+
+// Define the different gap sizes
+$gap-sizes: (
+  1: 4px,
+  2: 8px,
+  3: 16px,
+  4: 32px,
+);
+
+// Generate classes for flex row gap sizes
+@each $key, $size in $gap-sizes {
+  .gap-row-#{$key} {
     display: flex;
-    align-items: center;
-    max-width: 80%;
-    width: 50vh;
-    transition: all 0.2ms;
-    box-shadow: 1px 0px 20px 0px #e33030;
-    padding: 24px;
-    border-radius: 5px;
-    border: 7px solid #a0111100;
-    border-left-color: #e33030;
-  }
-
-  svg {
-    width: 100%;
+    flex-direction: row;
+    @include flex-gap($size);
   }
 }
 
-.time {
-  color: white;
+// Generate classes for flex column gap sizes
+@each $key, $size in $gap-sizes {
+  .gap-column-#{$key} {
+    display: flex;
+    flex-direction: column;
+    @include flex-gap($size);
+  }
 }
