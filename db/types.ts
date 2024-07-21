@@ -8,6 +8,8 @@ export type Bar = {
     id: Generated<number>;
     createdAt: Generated<string>;
     updatedAt: string;
+    startIntervalGroup: number;
+    endIntervalGroup: number;
     symbol: string;
     period: number;
     ctm: number;

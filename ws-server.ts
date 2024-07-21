@@ -27,14 +27,20 @@ export const wsServer = new WebSocketServer({
 wsServer.on("connection", (ws) => {
   ws.on("error", console.error);
 
-  ws.on("message", (data) => {
-    const message: {
-      tag: string;
-      args: any[];
-      method: keyof typeof wsMethods;
-    } = JSON.parse(data.toString());
-    const returnValue = (wsMethods?.[message.method] as any)?.(...message.args);
+  ws.on("message", async (data) => {
+    try {
+      const message: {
+        tag: string;
+        args: any[];
+        method: keyof typeof wsMethods;
+      } = JSON.parse(data.toString());
+      const returnValue = await (wsMethods?.[message.method] as any)?.(
+        ...message.args
+      );
 
-    ws.send(JSON.stringify({ tag: message.tag, returnValue }));
+      ws.send(JSON.stringify({ tag: message.tag, returnValue }));
+    } catch (error) {
+      console.log(error);
+    }
   });
 });

@@ -21,20 +21,21 @@ class WsClient {
   messagesChain = new Map<string, ChainFn>();
   constructor(wsUrl: string) {
     this.wsUrl = wsUrl;
-
     this.ws = this.connect();
   }
   connect() {
     const socket = new WebSocket(this.wsUrl);
 
     return new Promise<WebSocket>((resolve, reject) => {
-      socket.addEventListener("error", reject);
+      socket.addEventListener("error", () => {
+        resolve(this.connect());
+      });
       socket.addEventListener("close", () => {
         console.log("disconnected");
-        reject("disconnected");
       });
 
       socket.addEventListener("open", (event) => {
+        console.log("connected successful.");
         resolve(socket);
       });
 

@@ -1,5 +1,8 @@
+import { getCandlesRange } from "./methods/getCandlesRange";
+import { getStrongPairs } from "./methods/getStrongPairs";
+
 export const wsMethods = {
-  getStrongPairs: () => {
-    return { ok: "OK" };
-  },
+  getStrongPairs: getStrongPairs,
+  getSymbols: getStrongPairs,
+  getCandlesRange: getCandlesRange,
 };

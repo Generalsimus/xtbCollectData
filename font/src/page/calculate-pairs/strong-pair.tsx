@@ -1,4 +1,4 @@
-import { CalculatePairs } from "./calculate-pairs";
+import { CalculatePairs } from ".";
 import { ChooseInput } from "./choose-inpute";
 
 export const StrongPairPaige = () => {

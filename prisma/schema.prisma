@@ -25,6 +25,9 @@ model Bar {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  startIntervalGroup BigInt
+  endIntervalGroup   BigInt
+
   symbol String
   period Int
 
@@ -37,6 +40,8 @@ model Bar {
   vol       Float
 
   @@unique([symbol, period, ctm])
+  @@index([startIntervalGroup])
+  @@index([endIntervalGroup])
   @@index([symbol])
   @@index([period])
   @@index([ctm])

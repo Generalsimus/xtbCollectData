@@ -8,6 +8,12 @@ body {
   display: flex;
   flex-direction: column;
 }
+* {
+  text-decoration: none;
+}
+.hover-button:hover {
+  filter: brightness(0.8) !important;
+}
 
 .pointer {
   cursor: pointer;
@@ -16,40 +22,32 @@ body {
 .flex {
   display: flex;
 }
+.flex-1 {
+  flex: 1;
+}
 .row {
   flex-direction: row;
 }
 .column {
   flex-direction: column;
 }
-
-// Define mixins for flex gaps
-@mixin flex-gap($size) {
-  gap: $size;
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+} 
+.mb-5 {
+  margin-bottom: 5px;
+}
+.p-10 {
+  padding: 10px;
 }
 
-// Define the different gap sizes
-$gap-sizes: (
-  1: 4px,
-  2: 8px,
-  3: 16px,
-  4: 32px,
-);
-
-// Generate classes for flex row gap sizes
-@each $key, $size in $gap-sizes {
-  .gap-row-#{$key} {
-    display: flex;
-    flex-direction: row;
-    @include flex-gap($size);
-  }
+.gap-2 {
+  gap: 2px;
 }
 
-// Generate classes for flex column gap sizes
-@each $key, $size in $gap-sizes {
-  .gap-column-#{$key} {
-    display: flex;
-    flex-direction: column;
-    @include flex-gap($size);
-  }
+.bottom-line {
+  border-bottom: 1px solid black;
 }
