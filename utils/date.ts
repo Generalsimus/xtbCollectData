@@ -1,4 +1,6 @@
-export const HoursToMs = (hours: number) => hours * 60 * 60 * 1000;
+export const MinutesToMs = (minutes: number) => minutes * 60 * 1000;
+
+export const HoursToMs = (hours: number) => hours * MinutesToMs(60);
 
 export const YearsToMs = (yearsCount: number) =>
   yearsCount * 365.25 * 24 * 60 * 60 * 1000;

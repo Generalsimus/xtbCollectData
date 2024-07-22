@@ -2,47 +2,55 @@ import { sql } from "kysely";
 import { db } from "../db/db";
 import { xtbConnect } from "../ws-client";
 import { Bar } from "../db/types";
-import { DateAddDays } from "../utils/date";
+import { contactDbBars } from "./utils/contactBars";
+import { MinutesToMs } from "../utils/date";
+import { convertBarToPureBar } from "./utils/convertBarToPureBar";
 
-const contactBars = async () => {
-  const res = await Promise.all([
-    db
-      .updateTable("Bar")
-      .from("Bar as lowStart")
-      .set((eb) => ({
-        startIntervalGroup: eb.ref("lowStart.startIntervalGroup"),
-      }))
-      .whereRef("lowStart.startIntervalGroup", "<", "Bar.startIntervalGroup")
-      .whereRef("lowStart.endIntervalGroup", ">=", "Bar.startIntervalGroup")
-      .execute(),
-    db
-      .updateTable("Bar")
-      .from("Bar as hightEnd")
-      .set((eb) => ({
-        endIntervalGroup: eb.ref("hightEnd.endIntervalGroup"),
-      }))
-      .whereRef("hightEnd.startIntervalGroup", "<=", "Bar.endIntervalGroup")
-      .whereRef("hightEnd.endIntervalGroup", ">", "Bar.endIntervalGroup")
-      .execute(),
-  ]);
-  if (res.flat(2).some((el) => el.numUpdatedRows !== BigInt("0"))) {
-    await contactBars();
-  }
+export type PureBar = Pick<
+  Bar,
+  | "open"
+  | "close"
+  | "high"
+  | "low"
+  | "digits"
+  | "startIntervalGroup"
+  | "endIntervalGroup"
+> & {
+  time: number;
+  volume: number;
 };
 
-const getBarsFromDb = async (symbol: string, start: number, end: number) => {
-  const res = await sql<Bar>`select * from Bar
+const getBarsFromDb = async (
+  symbol: string,
+  start: number,
+  end: number,
+  intervalMinutes: number
+) => {
+  const res = await sql<PureBar>`
+select
+    MAX(Bar.high) as "high",
+    FIRST_VALUE(Bar.open) OVER (ORDER BY Bar.ctm ASC) AS open,
+    LAST_VALUE(Bar.close) OVER (ORDER BY Bar.ctm ASC) AS close,
+    MIN(Bar.startIntervalGroup) as "startIntervalGroup",
+    Max(Bar.endIntervalGroup) as "endIntervalGroup",
+    MIN(Bar.low) as "low",
+    AVG(Bar.digits) as "digits",
+    AVG(Bar.vol) as "volume",
+    AVG(Bar.ctm) as "time"
+    from Bar
 WHERE (Bar.ctm >= ${start} AND Bar.ctm <= ${end}) AND Bar.symbol = ${symbol}
-    ORDER BY Bar.ctm ASC`.execute(db);
+GROUP BY round(Bar.ctm / ${MinutesToMs(intervalMinutes)})
+ORDER BY Bar.ctm ASC;`.execute(db);
 
   return res.rows;
 };
 const getBarsFromCacheOrXtbClient = async (
   symbol: string,
   start: number,
-  end: number
+  end: number,
+  intervalMinutes: number
 ) => {
-  const cachedBars = await getBarsFromDb(symbol, start, end);
+  const cachedBars = await getBarsFromDb(symbol, start, end, 1);
 
   let previousStart = start;
   let maxEnd = 0;
@@ -64,8 +72,8 @@ const getBarsFromCacheOrXtbClient = async (
 
   if (awaitBars.length !== 0) {
     await Promise.all(awaitBars);
-    await contactBars();
-    return getBarsFromCacheOrXtbClient(symbol, start, end);
+    await contactDbBars();
+    return getBarsFromDb(symbol, start, end, intervalMinutes);
   }
   return cachedBars;
 };
@@ -73,9 +81,15 @@ const getBarsFromCacheOrXtbClient = async (
 export const getCandlesRange = async (
   symbol: string,
   start: number,
-  end: number
+  end: number,
+  intervalMinutes: number
 ) => {
-  const currentBars = await getBarsFromCacheOrXtbClient(symbol, start, end);
+  const currentBars = await getBarsFromCacheOrXtbClient(
+    symbol,
+    start,
+    end,
+    intervalMinutes
+  );
 
-  return currentBars;
+  return currentBars.map(convertBarToPureBar);
 };

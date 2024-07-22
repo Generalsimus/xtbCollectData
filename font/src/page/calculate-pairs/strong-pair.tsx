@@ -1,7 +1,13 @@
+import { StateChooseRouteType } from "src/add-page-button";
 import { CalculatePairs } from ".";
 import { ChooseInput } from "./choose-inpute";
 
-export const StrongPairPaige = () => {
+export const StrongPairPaige = (args: {
+  route: StateChooseRouteType
+  routesState: {
+    routes: StateChooseRouteType[];
+  }
+}) => {
   let options = ["USD", "JPY"];
   let values: string[] = [];
   let calculatePairs: string[] | undefined;

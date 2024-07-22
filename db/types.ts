@@ -12,6 +12,7 @@ export type Bar = {
     endIntervalGroup: number;
     symbol: string;
     period: number;
+    digits: number;
     ctm: number;
     ctmString: string;
     open: number;

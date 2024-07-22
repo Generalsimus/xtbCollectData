@@ -30,6 +30,7 @@ model Bar {
 
   symbol String
   period Int
+  digits Int
 
   ctm       BigInt
   ctmString DateTime

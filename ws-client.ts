@@ -129,6 +129,7 @@ class wsClient {
     };
     const result = await this.send<{
       returnData: {
+        digits: number;
         rateInfos: Omit<
           Bar,
           | "id"
@@ -139,10 +140,12 @@ class wsClient {
           | "symbol"
           | "startIntervalGroup"
           | "endIntervalGroup"
+          | "digits"
         >[];
       };
     }>(data);
     const resBars = result.returnData.rateInfos;
+    console.log("🚀 --> wsClient --> result:", result);
     if (resBars.length) {
       console.log("🚀 --> wsClient --> result DT:", {
         "resBars.length": resBars.length,
@@ -158,6 +161,7 @@ class wsClient {
         symbol: symbol,
         startIntervalGroup: start,
         endIntervalGroup: end,
+        digits: result.returnData.digits,
         ...el,
       };
     });
@@ -223,6 +227,7 @@ class wsClient {
           chunk.map((bar) => {
             return {
               period: bar.period,
+              digits: bar.digits,
               startIntervalGroup: bar.startIntervalGroup,
               endIntervalGroup: bar.endIntervalGroup,
               symbol: bar.symbol,
